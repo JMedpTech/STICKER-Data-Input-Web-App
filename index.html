@@ -8,6 +8,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #1a1a24; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         
+        /* Compact width para maging maayos at hindi masyadong mahaba ang mga box */
         .portal-container { width: 100%; max-width: 420px; background: linear-gradient(145deg, #252532, #1e1e29); border-radius: 12px; padding: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); border: 1px solid #2d2d3f; }
         
         .header-section { text-align: center; margin-bottom: 25px; }
@@ -17,11 +18,36 @@
         .form-group { margin-bottom: 18px; position: relative; }
         .form-group label { display: block; color: #ffb300; font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
         
-        .form-group input, .form-group select { width: 100%; padding: 12px; background-color: #2e2e3e; border: 1px solid #44445c; border-radius: 6px; color: #ffffff; font-size: 14px; outline: none; }
-        .form-group input:focus, .form-group select:focus { border-color: #ffcc00; }
+        /* Standard input at select styling */
+        .form-group input { width: 100%; padding: 12px; background-color: #2e2e3e; border: 1px solid #44445c; border-radius: 6px; color: #ffffff; font-size: 14px; outline: none; appearance: none; -webkit-appearance: none; -moz-appearance: none; }
+        .form-group input:focus { border-color: #ffcc00; }
         
+        /* Wrapper para sa fields na may custom arrow */
         .select-wrapper { position: relative; width: 100%; }
         
+        /* Custom Dropdown Arrow Icon para maging magkaparehas ang dalawang fields */
+        .select-wrapper::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #aaaaaa; /* Kulay ng arrow */
+            pointer-events: none; /* Para ma-click pa rin ang input sa ilalim */
+        }
+        
+        /* Puwersahing lumabas ang dropdown indicator at alisin ang default browser style ng datalist */
+        input[list]::-webkit-calendar-picker-indicator { 
+            display: inline-block !important;
+            opacity: 1 !important;
+            cursor: pointer;
+            filter: invert(70%); /* Itutugma ang kulay ng arrow sa supplier option */
+        }
+
         .hint-text { display: block; color: #8888a0; font-size: 10px; margin-top: 4px; font-style: italic; }
         .btn-submit { width: 100%; padding: 14px; background-color: #ffcc00; border: none; border-radius: 6px; color: #1a1a24; font-size: 13px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
         .btn-submit:hover { background-color: #e6b800; }
@@ -44,15 +70,15 @@
             <!-- Branch/Outlet -->
             <div class="form-group">
                 <label>Branch / Outlet:</label>
-                <input type="text" id="branch" placeholder="Type Here" required>
+                <input type="text" name="branch" placeholder="Type Here" required>
                 <span class="hint-text">e.g. Meycauayan Branch</span>
             </div>
 
-            <!-- Item / Equipment -->
+            <!-- Item / Equipment (EDITABLE DROPDOWN PERO PWEDE MAG-TYPE) -->
             <div class="form-group">
                 <label>Item / Equipment:</label>
                 <div class="select-wrapper">
-                    <input type="text" id="equipment" list="equipmentList" placeholder="Select / Type Here" autocomplete="off" required>
+                    <input type="text" name="equipment" list="equipmentList" placeholder="Select / Type Here" onclick="showDatalist(this)" autocomplete="off" required>
                 </div>
                 <datalist id="equipmentList">
                     <option value="STATION Ryzen3(GIGABYTE A520M K V2)"></option>
@@ -61,54 +87,81 @@
                     <option value="PRINTER EPSON L121"></option>
                     <option value="UPS-APC (SIMSERVER)"></option>
                     <option value="SWITCH HUB TPLINK (8 PORTS)"></option>
-                    <option value="HDD SKYHAWK"></option>
+                    <option value="HDD SKYHAWK (1TB)"></option>
+                    <option value="HDD TOSHIBA (1TB)"></option>
+                    <option value="AVR"></option>
+                    <option value="DAHUA CCTV KIT (4CH)"></option>
+                    <option value="DAHUA CCTV KIT (8CH)"></option>
+                    <option value="MONITOR kinsoyo (20inch)"></option>
                 </datalist>
+                <span class="hint-text">Select from the list or type your item.</span>
             </div>
 
-            <!-- Supplier -->
+            <!-- Supplier Name (EDITABLE DROPDOWN KAGAYA NG ITEM, PWEDE NA RIN MAG-TYPE) -->
             <div class="form-group">
-                <label>Supplier:</label>
-                <input type="text" id="supplier" placeholder="e.g. JINKAY" required>
+                <label>Supplier Name:</label>
+                <div class="select-wrapper">
+                    <input type="text" name="supplier" list="supplierList" placeholder="-- Select / Type Supplier --" onclick="showDatalist(this)" autocomplete="off" required>
+                </div>
+                <datalist id="supplierList">
+                    <option value="ASHERPEAK (DONOT REMOVE)"></option>
+                    <option value="AMAXph Tech.Inc.(DONOT REMOVE)"></option>
+                </datalist>
+                <span class="hint-text">Select from the list or type Supplier Name.</span>
             </div>
 
             <!-- SI Number -->
             <div class="form-group">
                 <label>SI Number:</label>
-                <input type="text" id="siNumber" placeholder="e.g. 12345" required>
+                <input type="text" name="siNumber" placeholder="Enter the SI number" required>
+                <span class="hint-text">e.g. SI#14872</span>
             </div>
 
-            <!-- Receipt Date -->
+            <!-- Date -->
             <div class="form-group">
-                <label>Receipt Date:</label>
-                <input type="date" id="receiptDate" required>
+                <label>Date (Receipt Date):</label>
+                <input type="date" id="receiptDate" name="receiptDate" required>
+                <span class="hint-text">Date format: MM/DD/YYYY</span>
             </div>
 
-            <button type="submit" id="submitBtn" class="btn-submit">Generate Sticker</button>
-            <div id="statusMsg" class="status-msg"></div>
+            <button type="submit" id="submitBtn" class="btn-submit">I-Save at I-Generate ang Sticker</button>
         </form>
+
+        <div id="statusBox" class="status-msg"></div>
     </div>
 
     <script>
-        // IPASTE DITO ANG IYONG BAGONG WEB APP URL MULA SA LRCI SPREADSHEET MO
+        window.onload = function() {
+            document.getElementById('receiptDate').value = new Date().toISOString().split('T')[0];
+        };
+
+        // Trick para puwersahing bumukas ang datalist dropdown kapag kinlick kahit saan sa loob ng input box o sa arrow
+        function showDatalist(input) {
+            input.value = ''; // Linisin sandali para makita ang buong listahan kapag kinlick muli
+            input.focus();
+        }
+
+        // PALITAN ANG LINK SA LOOB NG PANIPING ITO GAMIT ANG IYONG LRCI WEB APP URL
         const googleSheetUrl = "https://script.google.com/macros/s/AKfycbxlws1jQzbE_VS7G6tUKeTjiXnemnN7jRfm_s2ZYgEVEcCjGyvRLr5KoDv8pu0wdmmQnQ/exec"; 
 
         function submitToGoogleSheets(event) {
             event.preventDefault();
             
-            const submitBtn = document.getElementById("submitBtn");
-            const statusMsg = document.getElementById("statusMsg");
+            const form = document.getElementById('stickerForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const statusBox = document.getElementById('statusBox');
             
             submitBtn.disabled = true;
-            submitBtn.innerText = "Generating Sticker...";
-            statusMsg.style.display = "none";
-
-            // Pagkuha ng mga values mula sa form fields
+            submitBtn.innerText = "Isinusumite sa Database...";
+            statusBox.style.display = "none";
+            
+            // Inaayos ang pagpasa gamit ang URLSearchParams upang basahin ng e.parameter ng Code.gs
             const params = new URLSearchParams();
-            params.append('branch', document.getElementById("branch").value);
-            params.append('equipment', document.getElementById("equipment").value);
-            params.append('supplier', document.getElementById("supplier").value);
-            params.append('siNumber', document.getElementById("siNumber").value);
-            params.append('receiptDate', document.getElementById("receiptDate").value);
+            params.append('branch', form.branch.value);
+            params.append('equipment', form.equipment.value);
+            params.append('supplier', form.supplier.value);
+            params.append('siNumber', form.siNumber.value);
+            params.append('receiptDate', form.receiptDate.value);
 
             fetch(googleSheetUrl, {
                 method: "POST",
@@ -119,21 +172,19 @@
                 body: params.toString()
             })
             .then(() => {
-                statusMsg.className = "status-msg success";
-                statusMsg.innerText = "Sticker successfully generated in Google Sheets!";
-                statusMsg.style.display = "block";
-                document.getElementById("stickerForm").reset();
+                statusBox.className = "status-msg success";
+                statusBox.innerText = "Sticker successfully generated in Google Sheets with borders!";
+                statusBox.style.display = "block";
+                form.reset();
+                
+                // Ibalik ang default date ngayong araw pagkatapos mag-reset
+                document.getElementById('receiptDate').value = new Date().toISOString().split('T')[0];
+                
                 submitBtn.disabled = false;
-                submitBtn.innerText = "Generate Sticker";
+                submitBtn.innerText = "I-Save at I-Generate ang Sticker";
             })
             .catch(error => {
-                statusMsg.className = "status-msg error";
-                statusMsg.innerText = "Error: " + error;
-                statusMsg.style.display = "block";
+                statusBox.className = "status-msg error";
+                statusBox.innerText = "Error: " + error;
+                statusBox.style.display = "block";
                 submitBtn.disabled = false;
-                submitBtn.innerText = "Generate Sticker";
-            });
-        }
-    </script>
-</body>
-</html>

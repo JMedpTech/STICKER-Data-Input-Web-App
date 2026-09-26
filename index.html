@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LRCI - Sticker Portal System</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #1a1a24; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .portal-container { width: 100%; max-width: 420px; background: linear-gradient(145deg, #252532, #1e1e29); border-radius: 12px; padding: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); border: 1px solid #2d2d3f; }
+        
+        .header-section { text-align: center; margin-bottom: 25px; }
+        .header-section h1 { color: #ffcc00; font-size: 20px; font-weight: 800; margin-bottom: 5px; }
+        .header-section h2 { color: #ffcc00; font-size: 16px; font-weight: 700; margin-bottom: 5px; }
+        .header-section p { color: #a0a0b0; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+        .form-group { margin-bottom: 18px; position: relative; }
+        .form-group label { display: block; color: #ffb300; font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
+        
+        .form-group input, .form-group select { width: 100%; padding: 12px; background-color: #2e2e3e; border: 1px solid #44445c; border-radius: 6px; color: #ffffff; font-size: 14px; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: #ffcc00; }
+        
+        .select-wrapper { position: relative; width: 100%; }
+        
+        .hint-text { display: block; color: #8888a0; font-size: 10px; margin-top: 4px; font-style: italic; }
+        .btn-submit { width: 100%; padding: 14px; background-color: #ffcc00; border: none; border-radius: 6px; color: #1a1a24; font-size: 13px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
+        .btn-submit:hover { background-color: #e6b800; }
+        .btn-submit:disabled { background-color: #555; color: #aaa; cursor: not-allowed; }
+        .status-msg { margin-top: 15px; padding: 12px; border-radius: 6px; display: none; font-size: 13px; text-align: center; }
+        .success { background-color: #1b4332; color: #75e6da; border: 1px solid #2d6a4f; }
+        .error { background-color: #4c1d1d; color: #ff8b8b; border: 1px solid #7a2828; }
+    </style>
+</head>
+<body>
+
+    <div class="portal-container">
+        <div class="header-section">
+            <h1>LRCI - MEYCAUAYAN BRANCH</h1>
+            <h2>(EDP DEPARTMENT)</h2>
+            <p>Sticker Portal System</p>
+        </div>
+
+        <form id="stickerForm" onsubmit="submitToGoogleSheets(event)">
+            <!-- Branch/Outlet -->
+            <div class="form-group">
+                <label>Branch / Outlet:</label>
+                <input type="text" id="branch" placeholder="Type Here" required>
+                <span class="hint-text">e.g. Meycauayan Branch</span>
+            </div>
+
+            <!-- Item / Equipment -->
+            <div class="form-group">
+                <label>Item / Equipment:</label>
+                <div class="select-wrapper">
+                    <input type="text" id="equipment" list="equipmentList" placeholder="Select / Type Here" autocomplete="off" required>
+                </div>
+                <datalist id="equipmentList">
+                    <option value="STATION Ryzen3(GIGABYTE A520M K V2)"></option>
+                    <option value="SERVER i3 (MSI PRO H610M-S DDR4)"></option>
+                    <option value="MONITOR ACER (20inch)"></option>
+                    <option value="PRINTER EPSON L121"></option>
+                    <option value="UPS-APC (SIMSERVER)"></option>
+                    <option value="SWITCH HUB TPLINK (8 PORTS)"></option>
+                    <option value="HDD SKYHAWK"></option>
+                </datalist>
+            </div>
+
+            <!-- Supplier -->
+            <div class="form-group">
+                <label>Supplier:</label>
+                <input type="text" id="supplier" placeholder="e.g. JINKAY" required>
+            </div>
+
+            <!-- SI Number -->
+            <div class="form-group">
+                <label>SI Number:</label>
+                <input type="text" id="siNumber" placeholder="e.g. 12345" required>
+            </div>
+
+            <!-- Receipt Date -->
+            <div class="form-group">
+                <label>Receipt Date:</label>
+                <input type="date" id="receiptDate" required>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-submit">Generate Sticker</button>
+            <div id="statusMsg" class="status-msg"></div>
+        </form>
+    </div>
+
+    <script>
+        // IPASTE DITO ANG IYONG BAGONG WEB APP URL MULA SA LRCI SPREADSHEET MO
+        const googleSheetUrl = "https://google.com"; 
+
+        function submitToGoogleSheets(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById("submitBtn");
+            const statusMsg = document.getElementById("statusMsg");
+            
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Generating Sticker...";
+            statusMsg.style.display = "none";
+
+            // Pagkuha ng mga values mula sa form fields
+            const params = new URLSearchParams();
+            params.append('branch', document.getElementById("branch").value);
+            params.append('equipment', document.getElementById("equipment").value);
+            params.append('supplier', document.getElementById("supplier").value);
+            params.append('siNumber', document.getElementById("siNumber").value);
+            params.append('receiptDate', document.getElementById("receiptDate").value);
+
+            fetch(googleSheetUrl, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: params.toString()
+            })
+            .then(() => {
+                statusMsg.className = "status-msg success";
+                statusMsg.innerText = "Sticker successfully generated in Google Sheets!";
+                statusMsg.style.display = "block";
+                document.getElementById("stickerForm").reset();
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Generate Sticker";
+            })
+            .catch(error => {
+                statusMsg.className = "status-msg error";
+                statusMsg.innerText = "Error: " + error;
+                statusMsg.style.display = "block";
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Generate Sticker";
+            });
+        }
+    </script>
+</body>
+</html>
